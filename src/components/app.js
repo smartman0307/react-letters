@@ -1,80 +1,27 @@
-import fetch from 'isomorphic-fetch';
-import Loader from 'react-loaders';
-import React from 'react';
+import React, { PropTypes } from 'react';
 import storage from 'localforage';
 
-import CreatePost from './post/Create';
 import Nav from './nav/navbar';
-import Posts from './post/Posts';
 import Welcome from './welcome/Welcome';
 
 import '../styles/styles.scss';
 
-export default class App extends React.Component {
+export class App extends React.Component {
+  static propTypes = {
+    children: PropTypes.node,
+  }
+
   // Operations usually carried out in componentWillMount go here
   constructor(props) {
     super(props);
     this.hideBanner = this.hideBanner.bind(this);
-    this.handlePostSubmit = this.handlePostSubmit.bind(this);
     this.state = {
-      posts: [],
-      loaded: false,
       showBanner: false,
     };
   }
 
   componentDidMount() {
-    Promise.all([
-      this.initializeStorage(),
-      this.fetchPosts(),
-    ]).then(() => {
-      this.setState({
-        loaded: true,
-      });
-    });
-  }
-
-  handlePostSubmit(payload) {
-    // Disable empty posts
-    if (!payload.content) {
-      return;
-    }
-
-    // Update the local posts state optimistically
-    const oldPosts = this.state.posts;
-    oldPosts.unshift(payload);
-
-    this.setState({
-      posts: oldPosts,
-    });
-
-    // Create options for the request
-    const requestOptions = {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
-
-    // Send the new post to the API
-    fetch(`${process.env.ENDPOINT}/posts`, requestOptions)
-      .then((res) => {
-        if (res.ok === true) {
-          this.fetchPosts();
-        }
-      });
-  }
-
-  fetchPosts() {
-    // Fetch posts
-    return fetch(`${process.env.ENDPOINT}/posts?_limit=25&_sort=date&_order=DESC`)
-        .then(res => res.json())
-        .then((posts) => {
-          this.setState({
-            posts,
-          });
-        });
+    this.initializeStorage();
   }
 
   initializeStorage() {
@@ -104,23 +51,9 @@ export default class App extends React.Component {
       <div className="app">
         <Nav />
         <div className="container-fluid">
-          <div className="row">
-            {/* Main post area */}
-            <div className="col-xs-12 col-sm-offset-2 col-sm-8">
-              <CreatePost onSubmit={this.handlePostSubmit} />
-              {/* Loader */}
-              {
-                this.state.loaded ?
-                  <Posts posts={this.state.posts} />
-                :
-                <div className="loader">
-                  <Loader type="line-scale" active={this.state.loaded} />
-                </div>
-              }
-            </div>
-          </div>
 
-          {/* Welcome banner */}
+          {this.props.children}
+
           <Welcome
             show={this.state.showBanner}
             onClose={this.hideBanner}
