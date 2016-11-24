@@ -1,17 +1,15 @@
-import PropTypes from 'prop-types';
-import React from 'react';
+import React, { PropTypes } from 'react';
 
-const Content = props => {
-    const { post } = props;
-    return (
-        <p className="content">
-            {post.content}
-        </p>
-    );
+const Content = (props) => {
+  const { post } = props;
+  return (
+    <p className="content">
+      {post.content}
+    </p>
+  );
 };
 
 Content.propTypes = {
-    post: PropTypes.object
+  post: PropTypes.object,
 };
-
-export default Content;
+export { Content };

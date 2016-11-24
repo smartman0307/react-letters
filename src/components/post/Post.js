@@ -1,41 +1,38 @@
-import PropTypes from 'prop-types';
-import React from 'react';
+import React, { Component, PropTypes } from 'react';
 import Comments from '../comment/Comments';
 
-import Content from './Content';
-import Image from './Image';
-import Link from './Link';
-import Controls from './Controls';
-import User from './User';
+import { Content, Image, Link, Controls, User } from './';
 
-import RouterLink from '../router/Link';
+import { Link as RouterLink } from '../router';
 
-function Post(props) {
-    const { post, forceOpen } = props;
-    return post
-        ? <div className="post">
-              <RouterLink to={`/posts/${post.id}`}>
-                  {/* we're wrapping this because RouterLink expectes a single child */}
-                  <div>
-                      <User post={post} />
-                      <Content post={post} />
-                      <Image post={post} />
-                      <Link link={post.link} />
-                  </div>
-              </RouterLink>
+class Post extends Component {
+  static propTypes = {
+    post: PropTypes.object,
+    forceOpen: PropTypes.bool,
+  }
 
-              {post.comments
-                  ? <Comments forceOpen={forceOpen} post={post} />
-                  : null}
+  render() {
+    const { post, forceOpen } = this.props;
+    return (
+      post ?
+        <div className="post">
+          <RouterLink to={`/posts/${post.id}`}>
+            <div>
+              <User post={post} />
+              <Content post={post} />
+              <Image post={post} />
+              <Link link={post.link} />
+            </div>
+          </RouterLink>
 
-              <Controls post={post} />
-          </div>
-        : null;
+          { post.comments ? <Comments forceOpen={forceOpen} post={post} /> : null }
+
+          <Controls post={post} />
+        </div>
+      :
+        null
+    );
+  }
 }
 
-Post.propTypes = {
-    post: PropTypes.object,
-    forceOpen: PropTypes.bool
-};
-
-export default Post;
+export { Post };
